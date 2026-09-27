@@ -67,11 +67,14 @@
     "@nestjs/cli": "^10.3.0",
     "@nestjs/testing": "^12.1.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.20.4",
+    "@types/node": "^24.19.0",
     "@types/ws": "^8.18.1",
     "concurrently": "^10.0.5",
     "jest": "^30.5.2",
     "ts-jest": "^29.4.13",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=24.9"
   }
 }

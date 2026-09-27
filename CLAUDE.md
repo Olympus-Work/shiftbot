@@ -30,7 +30,7 @@ npm test -- src/modules/trading/trading.service.spec.ts   # single file
 npm test -- -t "closeLong"                                 # by test name
 ```
 
-NestJS 12 ships ESM-only. The app stays CommonJS and loads it through `require(esm)` (Node >= 22.12 at runtime), but Jest can only do that on **Node >= 24.9 with `--experimental-vm-modules`** — which is why the `test` scripts set `NODE_OPTIONS` and CI runs jest on the Node 24 leg only. A bare `npx jest` fails with `Must use import to load ES Module`. Don't reintroduce a `transformIgnorePatterns` that transpiles `@noble`/`@scure` (or `@nestjs`) to CJS: under vm-modules those files load as native ESM and the transpiled output dies with `exports is not defined`.
+**Node 24 is the only supported runtime** (`engines: >=24.9`) — it is what production runs, and CI tests on 24 only. `@types/node` is pinned to `^24` to match (Dependabot ignores its majors), so code can't type-check against APIs the runtime lacks. NestJS 12 ships ESM-only. The app stays CommonJS and loads it through `require(esm)`, but Jest can only do that **with `--experimental-vm-modules`** — which is why the `test` scripts set `NODE_OPTIONS`. A bare `npx jest` fails with `Must use import to load ES Module`. Don't reintroduce a `transformIgnorePatterns` that transpiles `@noble`/`@scure` (or `@nestjs`) to CJS: under vm-modules those files load as native ESM and the transpiled output dies with `exports is not defined`.
 
 There is no lint script/config in either `package.json` — don't invent one.
 
