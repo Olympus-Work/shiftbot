@@ -14,6 +14,11 @@ updates:
       prefix: chore
       prefix-development: chore(dev)
       include: scope
+    ignore:
+      # Types track the lowest runtime we support (22.12, see ci.yml); newer
+      # majors would let code type-check against APIs Node 22 doesn't have.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     # Majors land as their own PR — they need a real look.
     groups:
       bot-minor-patch:
