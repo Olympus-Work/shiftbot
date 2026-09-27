@@ -11,11 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 22.12 is the floor: ccxt 4.5.73 pulls ESM-only @noble/curves and
-        # NestJS 12 ships ESM-only, and this CommonJS app loads both through
-        # require(esm) — unflagged only from Node 22.12. 24.x is what the repo
-        # is developed on.
-        node: ['22.12', '24']
+        # Node 24 is what production runs and the supported floor (engines:
+        # >=24.9). Kept as a one-entry matrix so the check stays named
+        # "bot (24)" for branch protection.
+        node: ['24']
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +28,8 @@ jobs:
       # No DB needed: nothing under src/**/*.spec.ts imports TypeOrmModule,
       # so the wiring specs boot a real server without postgres.
       # Jest can only load the ESM-only NestJS 12 packages on Node >= 24.9
-      # (earlier versions fail with ERR_REQUIRE_ASYNC_MODULE), so the suite
-      # runs on the 24 leg only; the 22.12 leg still proves build + boot-load.
+      # (earlier versions fail with ERR_REQUIRE_ASYNC_MODULE).
       - name: Test
-        if: matrix.node == '24'
         run: npm test
 
       - name: Build
@@ -44,9 +41,9 @@ jobs:
       - name: ccxt loads under CJS
         run: node -e "require('ccxt'); console.log('ccxt ok')"
 
-      # Same idea for NestJS 12: jest is skipped on 22.12, so require the compiled
-      # module graph (every controller, service and Nest package) under plain CJS
-      # to prove the app still loads at the Node floor.
+      # Same idea for NestJS 12: jest runs under --experimental-vm-modules, so
+      # require the compiled module graph (every controller, service and Nest
+      # package) under plain CJS to prove the app loads the way `npm start` does.
       - name: App module loads under CJS
         run: node -e "require('./dist/app.module'); console.log('app.module ok')"
 
